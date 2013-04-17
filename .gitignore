@@ -9,3 +9,4 @@ puppet/modules/apt
 .vagrant
 puppet/.librarian
 puppet/.tmp
+target
