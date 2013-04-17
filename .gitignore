@@ -3,3 +3,9 @@
 .settings/org.eclipse.core.resources.prefs
 .settings/org.eclipse.jdt.groovy.core.prefs
 .settings/org.grails.ide.eclipse.core.prefs
+puppet/modules/mongodb
+puppet/modules/stdlib
+puppet/modules/apt
+.vagrant
+puppet/.librarian
+puppet/.tmp
