@@ -1,0 +1,13 @@
+FORGE
+  remote: http://forge.puppetlabs.com
+  specs:
+    portertech/mongodb (0.1.2)
+    puppetlabs/apt (1.1.0)
+      puppetlabs/stdlib (>= 2.2.1)
+    puppetlabs/stdlib (3.2.0)
+
+DEPENDENCIES
+  portertech/mongodb (= 0.1.2)
+  puppetlabs/apt (= 1.1.0)
+  puppetlabs/stdlib (= 3.2.0)
+
