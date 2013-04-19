@@ -23,6 +23,7 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         compile "joda-time:joda-time:2.1"
+		compile "org.spockframework:spock-grails-support:0.7-groovy-2.0"
     }
 
     plugins {
@@ -32,7 +33,7 @@ grails.project.dependency.resolution = {
             export = false
         }
 			  
-		compile ":mongodb:1.0.0.GA"
+		compile ":mongodb:1.1.0.GA"
 		
 		compile(":spock:0.7") {
 			exclude "spock-grails-support"
