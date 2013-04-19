@@ -6,6 +6,13 @@ import org.grails.datastore.mapping.mongo.query.MongoQuery;
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.Query.Between
 import org.grails.datastore.mapping.query.Query.Equals
+import org.grails.datastore.mapping.query.Query.GreaterThan
+import org.grails.datastore.mapping.query.Query.GreaterThanEquals
+import org.grails.datastore.mapping.query.Query.IsNotNull
+import org.grails.datastore.mapping.query.Query.IsNull
+import org.grails.datastore.mapping.query.Query.LessThan
+import org.grails.datastore.mapping.query.Query.LessThanEquals
+import org.grails.datastore.mapping.query.Query.NotEquals
 import org.joda.time.DateTimeZone
 import org.joda.time.LocalDate
 import org.joda.time.ReadablePartial
@@ -16,27 +23,31 @@ import com.mongodb.DBObject
 
 class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, DBObject, DBObject> {
 	
-	static String JODA_TYPE = "LocalDate"
+	static String JODA_TYPE = LocalDate.class.name
 	
 	LocalDateType() {
 		super(LocalDate)
 	}
 	
 	public DBObject toDBObject(LocalDate value) {
-		[
-			jodaValue: value.toDate(),
-			jodaType: JODA_TYPE
-		] as BasicDBObject
+		
+		if(value) {
+			return [
+				jodaValue: value?.toDate()?:null,
+				jodaType: JODA_TYPE
+			] as BasicDBObject
+		}
+		
+		return null
+		
 	}
 	
 	@Override
 	protected Object writeInternal(PersistentProperty property, String key, LocalDate value, DBObject nativeTarget) {
-		if(value) {
-			DBObject obj = toDBObject(value)
-			nativeTarget.put(key, obj)
-			return obj
-		}
-		return null
+		
+		DBObject obj = toDBObject(value)
+		nativeTarget.put(key, obj)
+		return obj
 	}
 	
 	public Date toDate(Object dtPart) {
@@ -52,29 +63,59 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	
 	@Override
 	protected void queryInternal(PersistentProperty property, String key, Query.PropertyCriterion criterion, DBObject nativeQuery) {
-		if(criterion instanceof Equals) {
-			Date dt = toDate(criterion.value)
-			if(dt) { 
-				nativeQuery["${key}.jodaType"] = JODA_TYPE
-				nativeQuery["${key}.jodaValue"] = dt
-			}	
-		} 
-		else if(criterion instanceof Between) {
-			Date fromDt = toDate(criterion.from)
-			Date toDt = toDate(criterion.to)
-		
-			if(fromDt && toDt) {
-				nativeQuery["${key}.jodaType"] = JODA_TYPE
-				
-				DBObject dbo = new BasicDBObject()
-				dbo.put(MongoQuery.MONGO_GTE_OPERATOR, fromDt);
-				dbo.put(MongoQuery.MONGO_LTE_OPERATOR, toDt);
-				
-				nativeQuery["${key}.jodaValue"] = dbo
+
+		Date dt = toDate(criterion.value)
+		if(dt) { 
+			DBObject dbo = new BasicDBObject()
+			nativeQuery["${key}.jodaType"] = JODA_TYPE
+			
+			switch(criterion) {
+				case Equals:
+					nativeQuery["${key}.jodaValue"] = dt
+					break
+				case NotEquals:
+					dbo.put(MongoQuery.MONGO_NE_OPERATOR, dt);
+					nativeQuery["${key}.jodaValue"] = dbo
+					break
+				case LessThan:
+					dbo.put(MongoQuery.MONGO_LT_OPERATOR, dt);
+					nativeQuery["${key}.jodaValue"] = dbo
+					break
+				case LessThanEquals:
+					dbo.put(MongoQuery.MONGO_LTE_OPERATOR, dt);
+					nativeQuery["${key}.jodaValue"] = dbo
+					break
+				case GreaterThan:
+					dbo.put(MongoQuery.MONGO_GT_OPERATOR, dt);
+					nativeQuery["${key}.jodaValue"] = dbo
+					break
+				case GreaterThanEquals:
+					dbo.put(MongoQuery.MONGO_GTE_OPERATOR, dt);
+					nativeQuery["${key}.jodaValue"] = dbo
+					break
+				// IsNotNull and IsNull are implemented directly in org.grails.datastore.mapping.mongo.query.MongoQuery
+				// but repeated here for completeness
+				case IsNotNull:
+					dbo.put(MongoQuery.MONGO_NE_OPERATOR, null);
+					nativeQuery["${key}.jodaValue"] = dbo
+					break
+				case IsNull:
+					nativeQuery["${key}.jodaValue"] = null
+					break
+				case Between:
+					Date fromDt = dt
+					Date toDt = toDate(criterion.to)
+					
+					dbo.put(MongoQuery.MONGO_GTE_OPERATOR, fromDt);
+					dbo.put(MongoQuery.MONGO_LTE_OPERATOR, toDt);
+					nativeQuery["${key}.jodaValue"] = dbo
+					break
+				default:
+					throw new RuntimeException("Unsupported query criterion type $criterion for property $property")
 			}
 		}
 		else {
-			throw new RuntimeException("unsupported query type for property $property")
+			throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
 		}
 	}
 	
