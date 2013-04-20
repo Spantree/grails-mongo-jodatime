@@ -14,22 +14,22 @@ import org.grails.datastore.mapping.query.Query.LessThan
 import org.grails.datastore.mapping.query.Query.LessThanEquals
 import org.grails.datastore.mapping.query.Query.NotEquals
 import org.joda.time.DateTimeZone
-import org.joda.time.LocalDate
+import org.joda.time.LocalDateTime
 import org.joda.time.ReadablePartial
 import org.joda.time.DateTimeFieldType
 
 import com.mongodb.BasicDBObject
 import com.mongodb.DBObject
 
-class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, DBObject, DBObject> {
+class LocalDateTimeType extends AbstractMappingAwareCustomTypeMarshaller<LocalDateTime, DBObject, DBObject> {
 	
-	static String JODA_TYPE = LocalDate.class.name
+	static String JODA_TYPE = LocalDateTime.class.name
 	
-	LocalDateType() {
-		super(LocalDate)
+	LocalDateTimeType() {
+		super(LocalDateTime)
 	}
 	
-	public DBObject toDBObject(LocalDate value) {
+	public DBObject toDBObject(LocalDateTime value) {
 		
 		if(value) {
 			return [
@@ -43,7 +43,7 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	}
 	
 	@Override
-	protected Object writeInternal(PersistentProperty property, String key, LocalDate value, DBObject nativeTarget) {
+	protected Object writeInternal(PersistentProperty property, String key, LocalDateTime value, DBObject nativeTarget) {
 		
 		DBObject obj = toDBObject(value)
 		nativeTarget.put(key, obj)
@@ -51,13 +51,24 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	}
 	
 	public Date toDate(Object dtPart) {
-		if(dtPart instanceof ReadablePartial 
+		if(dtPart instanceof ReadablePartial
 			&& dtPart.isSupported(DateTimeFieldType.monthOfYear())
 			&& dtPart.isSupported(DateTimeFieldType.year())
 			&& dtPart.isSupported(DateTimeFieldType.dayOfMonth())
+			&& dtPart.isSupported(DateTimeFieldType.hourOfDay())
+			&& dtPart.isSupported(DateTimeFieldType.minuteOfHour())
+			&& dtPart.isSupported(DateTimeFieldType.secondOfMinute())
+			&& dtPart.isSupported(DateTimeFieldType.millisOfSecond())
 			) {
 				
-			new LocalDate(dtPart.get(DateTimeFieldType.year()), dtPart.get(DateTimeFieldType.monthOfYear()), dtPart.get(DateTimeFieldType.dayOfMonth())).toDate()
+			new LocalDateTime(dtPart.get(DateTimeFieldType.year()), 
+				dtPart.get(DateTimeFieldType.monthOfYear()), 
+				dtPart.get(DateTimeFieldType.dayOfMonth()),
+				dtPart.get(DateTimeFieldType.hourOfDay()),
+				dtPart.get(DateTimeFieldType.minuteOfHour()),
+				dtPart.get(DateTimeFieldType.secondOfMinute()),
+				dtPart.get(DateTimeFieldType.millisOfSecond()),
+				).toDate()
 		}
 	}
 	
@@ -65,7 +76,7 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	protected void queryInternal(PersistentProperty property, String key, Query.PropertyCriterion criterion, DBObject nativeQuery) {
 
 		Date dt = toDate(criterion.value)
-		if(dt) { 
+		if(dt) {
 			DBObject dbo = new BasicDBObject()
 			nativeQuery["${key}.jodaType"] = JODA_TYPE
 			
@@ -120,11 +131,12 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	}
 	
 	@Override
-	protected LocalDate readInternal(PersistentProperty property, String key, DBObject nativeSource) {
-	    final value = nativeSource[key]
-	    if(value?.jodaType == JODA_TYPE) {
-	        return new LocalDate(value.jodaValue)
-	    }
-	    return null
+	protected LocalDateTime readInternal(PersistentProperty property, String key, DBObject nativeSource) {
+		final value = nativeSource[key]
+		if(value?.jodaType == JODA_TYPE) {
+			return new LocalDateTime(value.jodaValue)
+		}
+		return null
 	}
 }
+
