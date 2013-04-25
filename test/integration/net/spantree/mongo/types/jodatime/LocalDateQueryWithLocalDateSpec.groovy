@@ -8,7 +8,7 @@ import com.mongodb.DBAddress
 import com.mongodb.ServerAddress
 import spock.lang.Shared
 
-class LocalDateTypeSpec extends IntegrationSpec {
+class LocalDateQueryWithLocalDateSpec extends IntegrationSpec {
 
 	LocalDate dtNow = new LocalDate().now()
 	LocalDate dtTomorrow = dtNow.plusDays(1)

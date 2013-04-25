@@ -1,6 +1,8 @@
 package net.spantree.mongo.types.jodatime
 
 import grails.plugin.spock.IntegrationSpec
+import org.joda.time.DateTime
+import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import spock.lang.Specification
 import com.gmongo.GMongo
@@ -8,7 +10,7 @@ import com.mongodb.DBAddress
 import com.mongodb.ServerAddress
 import spock.lang.Shared
 
-class LocalDateTimeTypeSpec extends IntegrationSpec {
+class LocalDateTimeQueryWithLocalDateTimeSpec extends IntegrationSpec {
 
 	LocalDateTime dtNow = new LocalDateTime().now()
 	LocalDateTime dtTomorrow = dtNow.plusDays(1)
@@ -23,14 +25,19 @@ class LocalDateTimeTypeSpec extends IntegrationSpec {
 		new LocalDateTimeObject().save(flush:true)
 	}
 	
-	def "local date equals"() {
+	
+	def "local date time equals local date time"() {
 		when:
-			LocalDateTimeObject dateObj = LocalDateTimeObject.findByJodaLocalDate(dtNow)
+			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDate(dtNow)
 		then:
-			assert dateObj?.jodaLocalDate?.equals(dtNow)
+			Collection foundJodaLocalDates = foundObjs.collect{it.jodaLocalDate}
+			
+			assert !foundJodaLocalDates.contains(dtYesterday)
+			assert foundJodaLocalDates.contains(dtNow)
+			assert !foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
-	def "local date not equals"() {
+	def "local date time not equals local date time"() {
 		when:
 			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDateNotEqual(dtNow)
 		then:
@@ -41,7 +48,7 @@ class LocalDateTimeTypeSpec extends IntegrationSpec {
 			assert foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
-	def "local date greater than"() {
+	def "local date time greater than local date time"() {
 		when:
 			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDateGreaterThan(dtYesterday)
 		then:
@@ -52,7 +59,7 @@ class LocalDateTimeTypeSpec extends IntegrationSpec {
 			assert foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
-	def "local date greater than equals"() {
+	def "local date time greater than equals local date time"() {
 		when:
 			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDateGreaterThanEquals(dtYesterday)
 		then:
@@ -63,7 +70,7 @@ class LocalDateTimeTypeSpec extends IntegrationSpec {
 			assert foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
-	def "local date less than"() {
+	def "local date time less than local date time"() {
 		when:
 			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDateLessThan(dtTomorrow)
 		then:
@@ -74,7 +81,7 @@ class LocalDateTimeTypeSpec extends IntegrationSpec {
 			assert !foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
-	def "local date less than equals"() {
+	def "local date time less than equals local date time"() {
 		when:
 			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDateLessThanEquals(dtTomorrow)
 		then:
@@ -85,7 +92,7 @@ class LocalDateTimeTypeSpec extends IntegrationSpec {
 			assert foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
-	def "local date is null"() {
+	def "local date time is null  local date time"() {
 		when:
 			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDateIsNull()
 		then:
@@ -97,7 +104,7 @@ class LocalDateTimeTypeSpec extends IntegrationSpec {
 			assert !foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
-	def "local date is not null"() {
+	def "local date time is not null local date time"() {
 		when:
 			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDateIsNotNull()
 		then:
@@ -109,7 +116,7 @@ class LocalDateTimeTypeSpec extends IntegrationSpec {
 			assert foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
-	def "local date between query succeeds"() {
+	def "local date time between local date times"() {
 		when:
 			List foundObjs = LocalDateTimeObject.findAllByJodaLocalDateBetween(dtYesterday,dtTomorrow)
 		then:
