@@ -20,6 +20,8 @@ import org.joda.time.DateTimeFieldType
 
 import com.mongodb.BasicDBObject
 import com.mongodb.DBObject
+import java.util.List;
+
 
 class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, DBObject, DBObject> {
 	
@@ -50,72 +52,38 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 		return obj
 	}
 	
-	public Date toDate(Object dtPart) {
-		if(dtPart instanceof ReadablePartial 
-			&& dtPart.isSupported(DateTimeFieldType.monthOfYear())
-			&& dtPart.isSupported(DateTimeFieldType.year())
-			&& dtPart.isSupported(DateTimeFieldType.dayOfMonth())
-			) {
-				
-			new LocalDate(dtPart.get(DateTimeFieldType.year()), dtPart.get(DateTimeFieldType.monthOfYear()), dtPart.get(DateTimeFieldType.dayOfMonth())).toDate()
-		}
-	}
 	
 	@Override
 	protected void queryInternal(PersistentProperty property, String key, Query.PropertyCriterion criterion, DBObject nativeQuery) {
 
-		Date dt = toDate(criterion.value)
-		if(dt) { 
-			DBObject dbo = new BasicDBObject()
-			nativeQuery["${key}.jodaType"] = JODA_TYPE
+		if(criterion instanceof Between) {
 			
-			switch(criterion) {
-				case Equals:
-					nativeQuery["${key}.jodaValue"] = dt
-					break
-				case NotEquals:
-					dbo.put(MongoQuery.MONGO_NE_OPERATOR, dt);
-					nativeQuery["${key}.jodaValue"] = dbo
-					break
-				case LessThan:
-					dbo.put(MongoQuery.MONGO_LT_OPERATOR, dt);
-					nativeQuery["${key}.jodaValue"] = dbo
-					break
-				case LessThanEquals:
-					dbo.put(MongoQuery.MONGO_LTE_OPERATOR, dt);
-					nativeQuery["${key}.jodaValue"] = dbo
-					break
-				case GreaterThan:
-					dbo.put(MongoQuery.MONGO_GT_OPERATOR, dt);
-					nativeQuery["${key}.jodaValue"] = dbo
-					break
-				case GreaterThanEquals:
-					dbo.put(MongoQuery.MONGO_GTE_OPERATOR, dt);
-					nativeQuery["${key}.jodaValue"] = dbo
-					break
-				// IsNotNull and IsNull are implemented directly in org.grails.datastore.mapping.mongo.query.MongoQuery
-				// but repeated here for completeness
-				case IsNotNull:
-					dbo.put(MongoQuery.MONGO_NE_OPERATOR, null);
-					nativeQuery["${key}.jodaValue"] = dbo
-					break
-				case IsNull:
-					nativeQuery["${key}.jodaValue"] = null
-					break
-				case Between:
-					Date fromDt = dt
-					Date toDt = toDate(criterion.to)
-					
-					dbo.put(MongoQuery.MONGO_GTE_OPERATOR, fromDt);
-					dbo.put(MongoQuery.MONGO_LTE_OPERATOR, toDt);
-					nativeQuery["${key}.jodaValue"] = dbo
-					break
-				default:
-					throw new RuntimeException("Unsupported query criterion type $criterion for property $property")
+			Date fromDt = toDate(criterion.from)
+			Date toDt = toDate(criterion.to)
+			
+			if(!JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, fromDt, toDt)) {
+				List dtRange = toDateRange(criterion.from, criterion.to)
+				
+				if(!dtRange && JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dtRange[0], dtRange[1])) {
+					throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
+				}
 			}
+			
+			
 		}
 		else {
-			throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
+			Date dt = toDate(criterion.value)
+			
+			if(!JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dt)) {
+				
+				List dtRange = toDateRange(criterion.value)
+				
+				if(dtRange && !JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dtRange[0], dtRange[1])) {
+					throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
+				}
+			}
+			
+			
 		}
 	}
 	
@@ -126,5 +94,24 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	        return new LocalDate(value.jodaValue)
 	    }
 	    return null
+	}
+	
+	public Date toDate(Object dtPart) {
+		if(dtPart instanceof ReadablePartial
+			&& dtPart.isSupported(DateTimeFieldType.monthOfYear())
+			&& dtPart.isSupported(DateTimeFieldType.year())
+			&& dtPart.isSupported(DateTimeFieldType.dayOfMonth())
+			) {
+				
+			new LocalDate(dtPart.get(DateTimeFieldType.year()), dtPart.get(DateTimeFieldType.monthOfYear()), dtPart.get(DateTimeFieldType.dayOfMonth())).toDate()
+		}
+	}
+	
+	public List toDateRange(Object dtPart) {
+		
+	}
+	
+	public List toDateRange(Object dtPartFrom, Object dtPartTo) {
+		
 	}
 }
