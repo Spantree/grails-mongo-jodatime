@@ -1,4 +1,7 @@
-package net.spantree.mongo.types.jodatime
+package net.spantree.mongo.types.jodatime.query.builders
+
+import java.util.Date;
+import java.util.List;
 
 import org.grails.datastore.mapping.query.Query;
 import org.grails.datastore.mapping.query.Query.Between
@@ -17,9 +20,47 @@ import org.grails.datastore.mapping.mongo.query.MongoQuery;
 import com.mongodb.BasicDBObject
 import com.mongodb.DBObject;
 
-class JodaTimeMongoQueryBuilder {
+abstract class JodaTimeMongoQueryBuilder {
 
-	static boolean build(PersistentProperty property, String key, String type, Between criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	abstract public Date toDate(Object dtPart)
+	
+	abstract public List toDateRange(Object dtPart) 
+	
+	abstract public List toDateRange(Object dtPartFrom, Object dtPartTo)
+	
+	public buildQuery(PersistentProperty property, String key, String type, Query.PropertyCriterion criterion, DBObject nativeQuery) {
+		if(criterion instanceof Between) {
+			
+			Date fromDt = toDate(criterion.from)
+			Date toDt = toDate(criterion.to)
+			
+			if(!build(property, key, type, criterion, nativeQuery, fromDt, toDt)) {
+				List dtRange = toDateRange(criterion.from, criterion.to)
+				
+				if(!dtRange && build(property, key, type, criterion, nativeQuery, dtRange[0], dtRange[1])) {
+					throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
+				}
+			}
+			
+			
+		}
+		else {
+			Date dt = toDate(criterion.value)
+			
+			if(!build(property, key, type, criterion, nativeQuery, dt)) {
+				
+				List dtRange = toDateRange(criterion.value)
+				
+				if(dtRange && !build(property, key, type, criterion, nativeQuery, dtRange[0], dtRange[1])) {
+					throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
+				}
+			}
+			
+			
+		}
+	}
+	
+	boolean build(PersistentProperty property, String key, String type, Between criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		
 		if(fromDt && toDt) {
 			DBObject dbo = new BasicDBObject()
@@ -35,7 +76,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, Equals criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type, Equals criterion, DBObject nativeQuery, Date dt) {
 		
 		if(dt) {
 			nativeQuery["${key}.jodaType"] = type
@@ -48,7 +89,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, Equals criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type, Equals criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		
 		if(fromDt && toDt) {
 			DBObject dbo = new BasicDBObject()
@@ -64,7 +105,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, NotEquals criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type, NotEquals criterion, DBObject nativeQuery, Date dt) {
 		
 		if(dt) {
 			nativeQuery["${key}.jodaType"] = type
@@ -81,7 +122,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, NotEquals criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type, NotEquals criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		
 		if(fromDt && toDt) {
 			def criteria = []
@@ -114,7 +155,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, LessThan criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type, LessThan criterion, DBObject nativeQuery, Date dt) {
 		
 		if(dt) {
 			nativeQuery["${key}.jodaType"] = type
@@ -131,7 +172,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, LessThan criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type, LessThan criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		
 		if(fromDt && toDt) {
 			DBObject dbo = new BasicDBObject()
@@ -146,7 +187,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, LessThanEquals criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type, LessThanEquals criterion, DBObject nativeQuery, Date dt) {
 		
 		if(dt) {
 			nativeQuery["${key}.jodaType"] = type
@@ -163,7 +204,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, LessThanEquals criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type, LessThanEquals criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		
 		if(fromDt && toDt) {
 			DBObject dbo = new BasicDBObject()
@@ -178,7 +219,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, GreaterThan criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type, GreaterThan criterion, DBObject nativeQuery, Date dt) {
 		
 		if(dt) {
 			nativeQuery["${key}.jodaType"] = type
@@ -195,7 +236,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, GreaterThan criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type, GreaterThan criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		
 		if(fromDt && toDt) {
 			DBObject dbo = new BasicDBObject()
@@ -210,7 +251,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, GreaterThanEquals criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type, GreaterThanEquals criterion, DBObject nativeQuery, Date dt) {
 		
 		if(dt) {
 			nativeQuery["${key}.jodaType"] = type
@@ -227,7 +268,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, GreaterThanEquals criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type, GreaterThanEquals criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		
 		if(fromDt && toDt) {
 			DBObject dbo = new BasicDBObject()
@@ -242,7 +283,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, IsNotNull criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type, IsNotNull criterion, DBObject nativeQuery, Date dt) {
 		
 		nativeQuery["${key}.jodaType"] = type
 		
@@ -255,7 +296,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, IsNotNull criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type, IsNotNull criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 
 		DBObject dbo = new BasicDBObject()
 		nativeQuery["${key}.jodaType"] = type
@@ -266,7 +307,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, IsNull criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type, IsNull criterion, DBObject nativeQuery, Date dt) {
 
 		nativeQuery["${key}.jodaType"] = type
 		nativeQuery["${key}.jodaValue"] = null
@@ -275,7 +316,7 @@ class JodaTimeMongoQueryBuilder {
 		
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type, IsNull criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type, IsNull criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		
 		nativeQuery["${key}.jodaType"] = type
 		nativeQuery["${key}.jodaValue"] = null
@@ -284,11 +325,11 @@ class JodaTimeMongoQueryBuilder {
 				
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type,  Query.PropertyCriterion criterion, DBObject nativeQuery, Date dt) {
+	boolean build(PersistentProperty property, String key, String type,  Query.PropertyCriterion criterion, DBObject nativeQuery, Date dt) {
 		return false
 	}
 	
-	static boolean build(PersistentProperty property, String key, String type,  Query.PropertyCriterion criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
+	boolean build(PersistentProperty property, String key, String type,  Query.PropertyCriterion criterion, DBObject nativeQuery, Date fromDt, Date toDt) {
 		return false
 	}
 }

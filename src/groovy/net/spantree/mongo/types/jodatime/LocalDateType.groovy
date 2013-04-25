@@ -1,5 +1,7 @@
 package net.spantree.mongo.types.jodatime
 
+import net.spantree.mongo.types.jodatime.query.builders.LocalDateMongoQueryBuilder;
+
 import org.grails.datastore.mapping.engine.types.AbstractMappingAwareCustomTypeMarshaller
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.mongo.query.MongoQuery;
@@ -26,6 +28,7 @@ import java.util.List;
 class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, DBObject, DBObject> {
 	
 	static String JODA_TYPE = LocalDate.class.name
+	LocalDateMongoQueryBuilder queryBuilder = new LocalDateMongoQueryBuilder()
 	
 	LocalDateType() {
 		super(LocalDate)
@@ -55,36 +58,7 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	
 	@Override
 	protected void queryInternal(PersistentProperty property, String key, Query.PropertyCriterion criterion, DBObject nativeQuery) {
-
-		if(criterion instanceof Between) {
-			
-			Date fromDt = toDate(criterion.from)
-			Date toDt = toDate(criterion.to)
-			
-			if(!JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, fromDt, toDt)) {
-				List dtRange = toDateRange(criterion.from, criterion.to)
-				
-				if(!dtRange && JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dtRange[0], dtRange[1])) {
-					throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
-				}
-			}
-			
-			
-		}
-		else {
-			Date dt = toDate(criterion.value)
-			
-			if(!JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dt)) {
-				
-				List dtRange = toDateRange(criterion.value)
-				
-				if(dtRange && !JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dtRange[0], dtRange[1])) {
-					throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
-				}
-			}
-			
-			
-		}
+		queryBuilder.buildQuery(property, key, JODA_TYPE, criterion, nativeQuery)
 	}
 	
 	@Override
@@ -96,22 +70,4 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	    return null
 	}
 	
-	public Date toDate(Object dtPart) {
-		if(dtPart instanceof ReadablePartial
-			&& dtPart.isSupported(DateTimeFieldType.monthOfYear())
-			&& dtPart.isSupported(DateTimeFieldType.year())
-			&& dtPart.isSupported(DateTimeFieldType.dayOfMonth())
-			) {
-				
-			new LocalDate(dtPart.get(DateTimeFieldType.year()), dtPart.get(DateTimeFieldType.monthOfYear()), dtPart.get(DateTimeFieldType.dayOfMonth())).toDate()
-		}
-	}
-	
-	public List toDateRange(Object dtPart) {
-		
-	}
-	
-	public List toDateRange(Object dtPartFrom, Object dtPartTo) {
-		
-	}
 }

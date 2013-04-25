@@ -1,5 +1,7 @@
 package net.spantree.mongo.types.jodatime
 
+import net.spantree.mongo.types.jodatime.query.builders.LocalDateTimeMongoQueryBuilder;
+
 import org.grails.datastore.mapping.engine.types.AbstractMappingAwareCustomTypeMarshaller
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.mongo.query.MongoQuery;
@@ -31,6 +33,8 @@ class LocalDateTimeType extends AbstractMappingAwareCustomTypeMarshaller<LocalDa
 	
 	static String JODA_TYPE = LocalDateTime.class.name
 	
+	LocalDateTimeMongoQueryBuilder queryBuilder = new LocalDateTimeMongoQueryBuilder()
+	
 	LocalDateTimeType() {
 		super(LocalDateTime)
 	}
@@ -60,35 +64,7 @@ class LocalDateTimeType extends AbstractMappingAwareCustomTypeMarshaller<LocalDa
 	@Override
 	protected void queryInternal(PersistentProperty property, String key, Query.PropertyCriterion criterion, DBObject nativeQuery) {
 		
-		if(criterion instanceof Between) {
-			
-			Date fromDt = toDate(criterion.from)
-			Date toDt = toDate(criterion.to)
-			
-			if(!JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, fromDt, toDt)) {
-				List dtRange = toDateRange(criterion.from, criterion.to)
-				
-				if(!dtRange && JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dtRange[0], dtRange[1])) {
-					throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
-				}
-			}
-			
-			
-		}
-		else {
-			Date dt = toDate(criterion.value)
-			
-			if(!JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dt)) {
-				
-				List dtRange = toDateRange(criterion.value)
-				
-				if(dtRange && !JodaTimeMongoQueryBuilder.build(property, key, JODA_TYPE, criterion, nativeQuery, dtRange[0], dtRange[1])) {
-					throw new RuntimeException("Unable to parse query criterion value ${criterion.value}")
-				}
-			}
-			
-			
-		}
+		queryBuilder.buildQuery(property, key, JODA_TYPE, criterion, nativeQuery)
 	}
 	
 	@Override
@@ -99,60 +75,6 @@ class LocalDateTimeType extends AbstractMappingAwareCustomTypeMarshaller<LocalDa
 			return epochZero.plus(millis).toLocalDateTime()
 		}
 		return null
-	}
-	
-	public Date toDate(Object dtPart) {
-		
-		switch(dtPart) {
-			case DateTime:
-				return new Date(dtPart.toLocalDateTime().getLocalMillis())
-			case LocalDateTime:
-				return new Date(dtPart.toDateTime(DateTimeZone.UTC).toLocalDateTime().getLocalMillis())
-			case ReadablePartial:
-				if(dtPart.isSupported(DateTimeFieldType.monthOfYear())
-					&& dtPart.isSupported(DateTimeFieldType.year())
-					&& dtPart.isSupported(DateTimeFieldType.dayOfMonth())
-					&& dtPart.isSupported(DateTimeFieldType.hourOfDay())
-					&& dtPart.isSupported(DateTimeFieldType.minuteOfHour())
-					&& dtPart.isSupported(DateTimeFieldType.secondOfMinute())
-					&& dtPart.isSupported(DateTimeFieldType.millisOfSecond())
-					) {
-						
-					new Date( new LocalDateTime(dtPart.get(DateTimeFieldType.year()),
-						dtPart.get(DateTimeFieldType.monthOfYear()),
-						dtPart.get(DateTimeFieldType.dayOfMonth()),
-						dtPart.get(DateTimeFieldType.hourOfDay()),
-						dtPart.get(DateTimeFieldType.minuteOfHour()),
-						dtPart.get(DateTimeFieldType.secondOfMinute()),
-						dtPart.get(DateTimeFieldType.millisOfSecond())
-						).getLocalMillis() )
-						
-				}
-		}
-	}
-	
-	public List toDateRange(Object dtPart) {
-		
-		switch(dtPart) {
-			case LocalDate:
-				DateTime from = dtPart.toDateTime(LocalTime.MIDNIGHT,DateTimeZone.UTC)
-				DateTime to = from.plusDays(1).minusMillis(1)
-				
-				return [new Date(from.getMillis()), new Date(to.getMillis())]
-		}
-	}
-	
-	public List toDateRange(Object dtPartFrom, Object dtPartTo) {
-		
-		if(dtPartFrom.class == dtPartTo.class) {
-			switch(dtPartFrom) {
-				case LocalDate:
-					DateTime from = dtPartFrom.toDateTime(LocalTime.MIDNIGHT,DateTimeZone.UTC)
-					DateTime to = dtPartTo.toDateTime(LocalTime.MIDNIGHT,DateTimeZone.UTC).plusDays(1).minusMillis(1)
-					
-					return [new Date(from.getMillis()), new Date(to.getMillis())]
-			}
-		}
 	}
 	
 }
