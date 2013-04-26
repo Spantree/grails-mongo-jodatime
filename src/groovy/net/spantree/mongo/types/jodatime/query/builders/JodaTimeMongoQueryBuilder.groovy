@@ -43,6 +43,9 @@ abstract class JodaTimeMongoQueryBuilder {
 				case DateTime:
 					return new Interval(dt,dt)
 					break
+				case Interval:
+					return dt
+					break
 			}
 		}
 	}
