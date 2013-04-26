@@ -40,6 +40,9 @@ abstract class JodaTimeMongoQueryBuilder {
 					DateTime dtTime = dt.toDateTime(DateTimeZone.UTC)
 					return new Interval(dtTime,dtTime)
 					break
+				case DateTime:
+					return new Interval(dt,dt)
+					break
 			}
 		}
 	}
