@@ -17,6 +17,7 @@ import org.grails.datastore.mapping.query.Query.LessThanEquals
 import org.grails.datastore.mapping.query.Query.NotEquals
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import org.joda.time.Interval
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.LocalTime
@@ -42,9 +43,12 @@ class LocalDateTimeType extends AbstractMappingAwareCustomTypeMarshaller<LocalDa
 	public DBObject toDBObject(LocalDateTime value) {
 		
 		if(value) {
-			long millis = value.getLocalMillis()
+			DateTime dtTime = value.toDateTime(DateTimeZone.UTC)
+			Interval dtInterval = new Interval(dtTime,dtTime)
+			
 			return [
-				jodaValue: new Date(millis),
+				start: new Date(dtInterval.startMillis),
+				end: new Date(dtInterval.endMillis),
 				jodaType: JODA_TYPE
 			] as BasicDBObject
 		}
@@ -71,7 +75,7 @@ class LocalDateTimeType extends AbstractMappingAwareCustomTypeMarshaller<LocalDa
 	protected LocalDateTime readInternal(PersistentProperty property, String key, DBObject nativeSource) {
 		final value = nativeSource[key]
 		if(value?.jodaType == JODA_TYPE) {
-			long millis = value.jodaValue.getTime()
+			long millis = value.start.getTime()
 			return epochZero.plus(millis).toLocalDateTime()
 		}
 		return null

@@ -37,7 +37,7 @@ class LocalDateTimeQueryWithLocalDateSpec extends IntegrationSpec {
 			Collection foundJodaLocalDates = foundObjs.collect{it.jodaLocalDate}
 			
 			assert !foundJodaLocalDates.contains(dtYesterday)
-			assert foundJodaLocalDates.contains(dtNow)
+			assert !foundJodaLocalDates.contains(dtNow)
 			assert !foundJodaLocalDates.contains(dtTomorrow)
 	}
 	
