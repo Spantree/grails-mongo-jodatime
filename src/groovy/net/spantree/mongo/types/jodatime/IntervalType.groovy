@@ -44,11 +44,14 @@ class IntervalType extends AbstractMappingAwareCustomTypeMarshaller<Interval, DB
 		
 		if(value) {
 			
-			return [
-				start: new Date(value.startMillis),
-				end: new Date(value.endMillis),
+			BasicDBObject obj = [
 				jodaType: JODA_TYPE
 			] as BasicDBObject
+		
+			obj["${queryBuilder.INTERVAL_START}"] = new Date(value.startMillis)
+			obj["${queryBuilder.INTERVAL_END}"] = new Date(value.endMillis)
+			
+			return obj
 		}
 		
 		return null
@@ -73,8 +76,8 @@ class IntervalType extends AbstractMappingAwareCustomTypeMarshaller<Interval, DB
 		final value = nativeSource[key]
 		
 		if(value?.jodaType == JODA_TYPE) {
-			long millisStart = value.start.getTime()
-			long millisEnd = value.end.getTime()
+			long millisStart = value["${queryBuilder.INTERVAL_START}"].getTime()
+			long millisEnd = value["${queryBuilder.INTERVAL_START}"].getTime()
 			
 			return new Interval(epochZero.plus(millisStart),epochZero.plus(millisEnd))
 		}

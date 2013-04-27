@@ -47,11 +47,18 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 			
 			Interval dtInterval = new Interval(dtTimeStart,dtTimeEnd)
 
-			return [
-				start: new Date(dtInterval.startMillis),
-				end: new Date(dtInterval.endMillis),
+			BasicDBObject obj = [
 				jodaType: JODA_TYPE
 			] as BasicDBObject
+		
+			obj["${queryBuilder.INTERVAL_START}"] = new Date(dtInterval.startMillis)
+			obj["${queryBuilder.INTERVAL_END}"] = new Date(dtInterval.endMillis)
+		
+			value.getFieldTypes().each{  DateTimeFieldType fieldType ->
+				obj["jodaField_${fieldType.name}"] = value.get(fieldType)
+			}
+			
+			return obj
 		}
 		
 		return null
@@ -76,7 +83,7 @@ class LocalDateType extends AbstractMappingAwareCustomTypeMarshaller<LocalDate, 
 	protected LocalDate readInternal(PersistentProperty property, String key, DBObject nativeSource) {
 	    final value = nativeSource[key]
 	    if(value?.jodaType == JODA_TYPE) {
-	        return new LocalDate(value.start)
+	        return new LocalDate(value["${queryBuilder.INTERVAL_START}"])
 	    }
 	    return null
 	}

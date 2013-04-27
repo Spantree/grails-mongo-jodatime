@@ -50,8 +50,8 @@ abstract class JodaTimeMongoQueryBuilder {
 		}
 	}
 	
-	static String INTERVAL_START = "start"
-	static String INTERVAL_END = "end"
+	public static String INTERVAL_START = "interval_start"
+	public static String INTERVAL_END = "interval_end"
 	
 	static String MONGO_AND_OPERATOR = '$and'
 	

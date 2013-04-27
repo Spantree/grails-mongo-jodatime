@@ -33,6 +33,14 @@ class DateTimeType extends AbstractMappingAwareCustomTypeMarshaller<DateTime, DB
 	
 	static DateTime epochZero = new DateTime(1970,1,1,0,0,0,0,DateTimeZone.UTC)
 	
+	static List properties = [
+		
+			DateTimeFieldType.DAY_OF_MONTH_TYPE,
+			DateTimeFieldType.MILLIS_OF_DAY_TYPE,
+			DateTimeFieldType.MONTH_OF_YEAR_TYPE,
+			DateTimeFieldType.YEAR_TYPE,
+		]
+	
 	static String JODA_TYPE = DateTime.class.name
 	
 	DateTimeMongoQueryBuilder queryBuilder = new DateTimeMongoQueryBuilder()
@@ -46,11 +54,19 @@ class DateTimeType extends AbstractMappingAwareCustomTypeMarshaller<DateTime, DB
 		if(value) {
 			Interval dtInterval = new Interval(value,value)
 			
-			return [
-				start: new Date(dtInterval.startMillis),
-				end: new Date(dtInterval.endMillis),
+			BasicDBObject obj = [
 				jodaType: JODA_TYPE
 			] as BasicDBObject
+		
+			obj["${queryBuilder.INTERVAL_START}"] = new Date(dtInterval.startMillis)
+			obj["${queryBuilder.INTERVAL_END}"] = new Date(dtInterval.endMillis)
+			
+			obj["jodaField_zone"] = value.zone.toString()
+			
+			properties.each{  DateTimeFieldType fieldType ->
+				obj["jodaField_${fieldType.name}"] = value.get(fieldType)
+			}
+			return obj
 		}
 		
 		return null
@@ -75,7 +91,7 @@ class DateTimeType extends AbstractMappingAwareCustomTypeMarshaller<DateTime, DB
 	protected DateTime readInternal(PersistentProperty property, String key, DBObject nativeSource) {
 		final value = nativeSource[key]
 		if(value?.jodaType == JODA_TYPE) {
-			long millis = value.start.getTime()
+			long millis = value["${queryBuilder.INTERVAL_START}"].getTime()
 			return epochZero.plus(millis)
 		}
 		return null
