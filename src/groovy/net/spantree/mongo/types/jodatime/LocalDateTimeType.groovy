@@ -1,7 +1,6 @@
 package net.spantree.mongo.types.jodatime
 
-import net.spantree.mongo.types.jodatime.query.builders.LocalDateTimeMongoQueryBuilder;
-
+import net.spantree.mongo.types.jodatime.query.builders.JodaTimeMongoQueryBuilder
 import org.grails.datastore.mapping.engine.types.AbstractMappingAwareCustomTypeMarshaller
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.mongo.query.MongoQuery;
@@ -34,7 +33,7 @@ class LocalDateTimeType extends AbstractMappingAwareCustomTypeMarshaller<LocalDa
 	
 	static String JODA_TYPE = LocalDateTime.class.name
 	
-	LocalDateTimeMongoQueryBuilder queryBuilder = new LocalDateTimeMongoQueryBuilder()
+	JodaTimeMongoQueryBuilder queryBuilder = new JodaTimeMongoQueryBuilder()
 	
 	LocalDateTimeType() {
 		super(LocalDateTime)

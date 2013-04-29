@@ -1,8 +1,6 @@
 package net.spantree.mongo.types.jodatime
 
-import net.spantree.mongo.types.jodatime.query.builders.DateTimeMongoQueryBuilder
-import net.spantree.mongo.types.jodatime.query.builders.LocalDateTimeMongoQueryBuilder;
-
+import net.spantree.mongo.types.jodatime.query.builders.JodaTimeMongoQueryBuilder
 import org.grails.datastore.mapping.engine.types.AbstractMappingAwareCustomTypeMarshaller
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.mongo.query.MongoQuery;
@@ -34,7 +32,7 @@ class IntervalType extends AbstractMappingAwareCustomTypeMarshaller<Interval, DB
 	static String JODA_TYPE = DateTime.class.name
 	static DateTime epochZero = new DateTime(1970,1,1,0,0,0,0,DateTimeZone.UTC)
 	
-	DateTimeMongoQueryBuilder queryBuilder = new DateTimeMongoQueryBuilder()
+	JodaTimeMongoQueryBuilder queryBuilder = new JodaTimeMongoQueryBuilder()
 	
 	IntervalType() {
 		super(Interval)
