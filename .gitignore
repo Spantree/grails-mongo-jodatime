@@ -10,3 +10,6 @@ puppet/modules/apt
 puppet/.librarian
 puppet/.tmp
 target
+*.zip
+*.sha1
+plugin.xml
