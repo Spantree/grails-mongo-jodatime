@@ -27,7 +27,14 @@ import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 import org.joda.time.DateTimeZone
 
-abstract class JodaTimeMongoQueryBuilder {
+class JodaTimeMongoQueryBuilder {
+	
+	public static String INTERVAL_START = "interval_start"
+	public static String INTERVAL_END = "interval_end"
+	public static String TIME = "time"
+	
+	static String MONGO_AND_OPERATOR = '$and'
+	
 	public Interval toInterval(Object dt) {
 		if(dt) {
 			switch(dt) {
@@ -50,10 +57,6 @@ abstract class JodaTimeMongoQueryBuilder {
 		}
 	}
 	
-	public static String INTERVAL_START = "interval_start"
-	public static String INTERVAL_END = "interval_end"
-	
-	static String MONGO_AND_OPERATOR = '$and'
 	
 	public buildQuery(PersistentProperty property, String key, String type, Query.PropertyCriterion criterion, DBObject nativeQuery) {
 		
