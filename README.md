@@ -39,7 +39,7 @@ Here is how the above DomainClass currently looks when it is persisted:
 
 ```
 { "_id" : ObjectId( "517f0ef83d1af39278d7afad" ),
-  "dateCreated" : { "jodaType" : "org.joda.time.DateTime",
+  "someDate" : { "jodaType" : "org.joda.time.DateTime",
     "interval_start" : Date( 1367281400512 ),
     "interval_end" : Date( 1367281400512 ),
     "jodaField_zone" : "America/Chicago",
