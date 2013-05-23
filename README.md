@@ -8,7 +8,7 @@ This is a plugin that works with the [Grails MongoDB GORM plugin](http://grails.
 ### Querying
 We **don't** want this:
 
-```
+```groovy
 class DomainClass {
 	Date someDate //ugh, Date objects are a pain!
 }
@@ -16,7 +16,7 @@ class DomainClass {
 
 We **would** like this:
 
-```
+```groovy
 class DomainClass {
 	DateTime someDate //yay, Joda Time is useful!
 }
@@ -24,7 +24,7 @@ class DomainClass {
 
 And then we'd like to be able to be able to do queries like this:
 
-```
+```groovy
 //Find by using Joda Time objects
 DomainClass.findBySomeDate(new DateTime())
 
@@ -37,9 +37,11 @@ We want the plugin to lay out our date objects in such a way that they're easy t
 
 Here is how the above DomainClass currently looks when it is persisted:
 
-```
-{ "_id" : ObjectId( "517f0ef83d1af39278d7afad" ),
-  "someDate" : { "jodaType" : "org.joda.time.DateTime",
+```json
+{
+  "_id" : ObjectId( "517f0ef83d1af39278d7afad" ),
+  "someDate" : {
+    "jodaType" : "org.joda.time.DateTime",
     "interval_start" : Date( 1367281400512 ),
     "interval_end" : Date( 1367281400512 ),
     "jodaField_zone" : "America/Chicago",
@@ -49,8 +51,10 @@ Here is how the above DomainClass currently looks when it is persisted:
     "jodaField_minuteOfHour" : 23,
     "jodaField_millisOfSecond" : 512,
     "jodaField_monthOfYear" : 4,
-    "jodaField_year" : 2013 },
-  "version" : 1 }
+    "jodaField_year" : 2013
+  },
+  "version" : 1
+}
 ```
 
 ## Current support
