@@ -75,7 +75,7 @@ class IntervalType extends AbstractMappingAwareCustomTypeMarshaller<Interval, DB
 		
 		if(value?.jodaType == JODA_TYPE) {
 			long millisStart = value["${queryBuilder.INTERVAL_START}"].getTime()
-			long millisEnd = value["${queryBuilder.INTERVAL_START}"].getTime()
+			long millisEnd = value["${queryBuilder.INTERVAL_END}"].getTime()
 			
 			return new Interval(epochZero.plus(millisStart),epochZero.plus(millisEnd))
 		}
