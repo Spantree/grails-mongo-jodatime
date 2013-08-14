@@ -3,7 +3,7 @@ import net.spantree.mongo.types.jodatime.LocalDateTimeType
 import net.spantree.mongo.types.jodatime.DateTimeType
 import net.spantree.mongo.types.jodatime.IntervalType
 
-class GrailsMongoJodatimeGrailsPlugin {
+class MongoJodatimeGrailsPlugin {
 	def groupId = 'net.spantree'
 	
     // the plugin version
