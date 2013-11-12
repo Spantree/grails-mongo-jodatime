@@ -4,8 +4,6 @@ import net.spantree.mongo.types.jodatime.LocalDateTimeType
 import net.spantree.mongo.types.jodatime.LocalDateType
 
 class MongoJodatimeGrailsPlugin {
-	def groupId = 'net.spantree'
-
 	def version = "0.1.2"
 	def grailsVersion = "2.0 > *"
 	def pluginExcludes = [

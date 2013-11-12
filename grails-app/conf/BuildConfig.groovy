@@ -1,7 +1,5 @@
 grails.project.work.dir = 'target'
 
-grails.project.repos.default = "spantree"
-
 grails.project.dependency.resolution = {
 
 	inherits 'global'
