@@ -12,3 +12,6 @@ target
 *.sha1
 plugin.xml
 web-app
+
+*.iml
+.idea

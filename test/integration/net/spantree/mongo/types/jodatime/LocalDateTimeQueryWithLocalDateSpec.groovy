@@ -11,7 +11,7 @@ class LocalDateTimeQueryWithLocalDateSpec extends IntegrationSpec {
 	LocalDateTime dtTomorrow = dtNow.plusDays(1)
 	LocalDateTime dtYesterday = dtNow.minusDays(1)
 
-	LocalDate dNow = new LocalDate().now()
+	LocalDate dNow = new LocalDate(dtNow)
 	LocalDate dTomorrow = dNow.plusDays(1)
 	LocalDate dYesterday = dNow.minusDays(1)
 

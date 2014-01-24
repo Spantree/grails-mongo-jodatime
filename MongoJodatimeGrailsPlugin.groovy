@@ -4,7 +4,7 @@ import net.spantree.mongo.types.jodatime.LocalDateTimeType
 import net.spantree.mongo.types.jodatime.LocalDateType
 
 class MongoJodatimeGrailsPlugin {
-	def version = "0.1.2"
+	def version = "0.1.3"
 	def grailsVersion = "2.0 > *"
 	def pluginExcludes = [
 		"grails-app/domain/**",
@@ -16,7 +16,7 @@ class MongoJodatimeGrailsPlugin {
 
 	def license = "APACHE"
 	def organization = [name: "Spantree Technology Group, LLC", url: "http://www.spantree.net/"]
-	def developers = [[name: "Gary Turovsky", email: "gary@spantree.net"]]
+	def developers = [[name: "Gary Turovsky", email: "gary@spantree.net"], [name: "Kevin Greene", email: "kevin@spantree.net"]]
 	def issueManagement = [system: "GITHUB", url: "https://github.com/Spantree/grails-mongo-jodatime/issues"]
 	def scm = [url: "https://github.com/Spantree/grails-mongo-jodatime"]
 
