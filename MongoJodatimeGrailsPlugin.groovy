@@ -2,6 +2,7 @@ import net.spantree.mongo.types.jodatime.DateTimeType
 import net.spantree.mongo.types.jodatime.IntervalType
 import net.spantree.mongo.types.jodatime.LocalDateTimeType
 import net.spantree.mongo.types.jodatime.LocalDateType
+import net.spantree.mongo.types.jodatime.LocalTimeType
 
 class MongoJodatimeGrailsPlugin {
 	def version = "0.1.3"
@@ -25,5 +26,6 @@ class MongoJodatimeGrailsPlugin {
 		localDateTimeType(LocalDateTimeType)
 		dateTimeType(DateTimeType)
 		intervalType(IntervalType)
+		localTimeType(LocalTimeType)
 	}
 }
