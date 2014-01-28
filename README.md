@@ -65,6 +65,7 @@ This plugin currently supports persisting and querying these Joda Time objects:
 * Interval
 * LocalDate
 * LocalDateTime
+* LocalTime
 
 It is currently possible to query any of the above objects using any of the other above objects.  
 
