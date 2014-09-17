@@ -1,7 +1,6 @@
 package net.spantree.mongo.types.jodatime
 
-import grails.plugin.spock.IntegrationSpec
-
+import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 
 class DateTimeQueryWithDateTimeSpec extends IntegrationSpec {
@@ -13,6 +12,7 @@ class DateTimeQueryWithDateTimeSpec extends IntegrationSpec {
 	def setup() {
 		DateTimeObject.where{}.deleteAll()
 
+        new DateTimeObject(jodaDate: dtNow.plusYears(1)).save(flush: true)
 		new DateTimeObject(jodaDate:dtNow).save(flush:true)
 		new DateTimeObject(jodaDate:dtTomorrow).save(flush:true)
 		new DateTimeObject(jodaDate:dtYesterday).save(flush:true)

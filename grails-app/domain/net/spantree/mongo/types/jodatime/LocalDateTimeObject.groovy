@@ -11,4 +11,8 @@ class LocalDateTimeObject {
 
 	ObjectId id
 	LocalDateTime jodaLocalDate
+
+    static constraints = {
+        jodaLocalDate nullable: true
+    }
 }

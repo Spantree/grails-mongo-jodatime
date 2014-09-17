@@ -9,6 +9,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.synced_folder ".", "/home/vagrant/src/plugin"
+  config.vm.network "forwarded_port", guest: 27017, host: 27017
 
   config.vm.define :db do |db|
     db.vm.hostname = "db.dev.gmj.local"

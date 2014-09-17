@@ -1,7 +1,6 @@
 package net.spantree.mongo.types.jodatime
 
-import grails.plugin.spock.IntegrationSpec
-
+import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.joda.time.Interval
 
@@ -18,6 +17,7 @@ class IntervalQueryWithIntervalSpec extends IntegrationSpec {
 	def setup() {
 		IntervalObject.where{}.deleteAll()
 
+        new IntervalObject(jodaInterval: new Interval(dtNow, dtNow.plusYears(1))).save(flush: true)
 		new IntervalObject(jodaInterval:iNow).save(flush:true)
 		new IntervalObject(jodaInterval:iTomorrow).save(flush:true)
 		new IntervalObject(jodaInterval:iYesterday).save(flush:true)

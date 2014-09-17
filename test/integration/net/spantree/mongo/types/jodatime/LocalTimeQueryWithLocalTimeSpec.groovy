@@ -1,8 +1,8 @@
 package net.spantree.mongo.types.jodatime
 
-import grails.plugin.spock.IntegrationSpec
-import org.joda.time.LocalDate
-import org.joda.time.LocalDateTime
+import grails.test.spock.IntegrationSpec
+
+//import grails.plugin.spock.IntegrationSpec
 import org.joda.time.LocalTime
 
 class LocalTimeQueryWithLocalTimeSpec extends IntegrationSpec {

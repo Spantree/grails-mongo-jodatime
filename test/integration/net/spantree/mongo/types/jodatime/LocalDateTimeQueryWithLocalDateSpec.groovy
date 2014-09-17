@@ -1,7 +1,6 @@
 package net.spantree.mongo.types.jodatime
 
-import grails.plugin.spock.IntegrationSpec
-
+import grails.test.spock.IntegrationSpec
 import org.joda.time.LocalDate
 import org.joda.time.LocalDateTime
 
@@ -18,6 +17,7 @@ class LocalDateTimeQueryWithLocalDateSpec extends IntegrationSpec {
 	def setup() {
 		LocalDateTimeObject.where{}.deleteAll()
 
+        new LocalDateTimeObject(jodaLocalDate: new LocalDateTime().plusYears(1)).save(flush: true)
 		new LocalDateTimeObject(jodaLocalDate:dtNow).save(flush:true)
 		new LocalDateTimeObject(jodaLocalDate:dtTomorrow).save(flush:true)
 		new LocalDateTimeObject(jodaLocalDate:dtYesterday).save(flush:true)
@@ -59,7 +59,7 @@ class LocalDateTimeQueryWithLocalDateSpec extends IntegrationSpec {
 
 	def "local date time greater than equals local date"() {
 		when:
-			List foundObjs = LocalDateTimeObject.findAll{ jodaLocalDate >= dNow}
+			List foundObjs = LocalDateTimeObject.findAll{ jodaLocalDate >= dtNow}
 		then:
 			Collection foundJodaLocalDates = foundObjs.collect{it.jodaLocalDate}
 
