@@ -24,7 +24,6 @@ grails.project.dependency.resolution = {
 		test "org.spockframework:spock-grails-support:0.7-groovy-2.0", {
 			export = false
 		}
-        //compile('org.mongodb:mongo-java-driver:2.10.1')
 
     }
 
@@ -33,9 +32,6 @@ grails.project.dependency.resolution = {
 			export = false
 		}
 		compile(":mongodb:3.0.2")
-//		compile(":spock:0.7") {
-//			exclude "spock-grails-support"
-//			export = false
-//		}
+
 	}
 }
